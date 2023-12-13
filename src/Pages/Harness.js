@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   HarnessPageWrapper,
   HarnessProjectName,
@@ -24,19 +24,24 @@ import {
   HarnessPageBackground,
   SaveButton,
   HarnessTitle,
+  HarnessLine,
+  HomepageOverlay,
+  HarnessOverlay,
 } from "./style";
 
-import bg from "../Assets/Images/brown-bg.jpg"
+import bg from "../Assets/Images/field-sunset.jpg"
 
 const Harness = () => {
   const [projectInfo, setProjectInfo] = useState();
   const location = useLocation();
+  const navigate = useNavigate();;
 
   useEffect(() => {
     fetchProject();
+    window.scrollTo(0, 0);
   }, []);
 
-  const projectId = location.state.id ? location.state.id : "1";
+  const projectId = location.state ? location.state.id : "1";
 
   const fetchProject = () => {
     const project = JSON.parse(localStorage.getItem("projects")).find(
@@ -57,9 +62,26 @@ const Harness = () => {
     window.location.reload();
   }
 
+  const handleDelete = () => {
+    let index = null;
+    const currentProjects = JSON.parse(localStorage.getItem("projects")).map((elem, ind) => {
+      if(elem.id === projectId){
+        index = ind;
+      }
+      return elem;
+    });
+    if(index !== null){
+      currentProjects.splice(index, 1);
+    }
+    localStorage.setItem("projects", JSON.stringify(currentProjects));
+    navigate("/projects");
+    window.location.reload()
+  }
+
   return (
     <div>
     <HarnessPageBackground src={bg}/>
+    <HarnessOverlay />
     <HarnessPageWrapper>
       {projectInfo && (
         <HarnessPageInnerWrapper>
@@ -70,6 +92,7 @@ const Harness = () => {
                 setProjectInfo({ ...projectInfo, name: e.target.value })
               }
               value={projectInfo.name}
+              maxLength="100"
             />
           </HarnessProjectNameContainer>
           <HarnessTitle>STALLION HARNESS</HarnessTitle>
@@ -148,19 +171,19 @@ const Harness = () => {
                 value={projectInfo.resources}
               ></ConstraintTextField>
             </ConstraintContainer>
-            <ConstraintContainer>
-              <ContextTitle>MISC</ContextTitle>
-              <ConstraintTextField onChange={(e) =>
-                setProjectInfo({ ...projectInfo, misc: e.target.value })
-              }
-              value={projectInfo.misc}></ConstraintTextField>
-              </ConstraintContainer>
               <ConstraintContainer>
               <ContextTitle>TIME</ContextTitle>
               <ConstraintTextField onChange={(e) =>
                 setProjectInfo({ ...projectInfo, time: e.target.value })
               }
               value={projectInfo.time}></ConstraintTextField>
+              </ConstraintContainer>
+              <ConstraintContainer>
+              <ContextTitle>MISC</ContextTitle>
+              <ConstraintTextField onChange={(e) =>
+                setProjectInfo({ ...projectInfo, misc: e.target.value })
+              }
+              value={projectInfo.misc}></ConstraintTextField>
               </ConstraintContainer>
           </ContextRow>
           <ContextRow>
@@ -191,6 +214,7 @@ const Harness = () => {
               value={projectInfo.deadline}></ConstraintTextField>
               </ConstraintContainer>
           </ContextRow>
+          <HarnessContextTitle>OUTCOMES</HarnessContextTitle>
           <RewardsRow>
             <RewardsContainer>
               <RewardsTitle>I'LL REWARD MYSELF WITH</RewardsTitle>
@@ -214,7 +238,10 @@ const Harness = () => {
               value={projectInfo.actualOutcome} ></RewardsTextField>
             </RewardsContainer>
           </RewardsRow>
+          <RewardsRow>
           <SaveButton onClick={() => handleSave()}>SAVE</SaveButton>
+          <SaveButton onClick={() => handleDelete()}>DELETE</SaveButton>
+          </RewardsRow>
         </HarnessPageInnerWrapper>
       )}
     </HarnessPageWrapper>

@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import bg from "../Assets/Images/sunset-pasture.jpg";
 import {
-  HomepageAboutContainer,
-  HomepageAboutSubTitle,
-  HomepageAboutText,
-  HomepageAboutTitle,
   HomepageBackground,
-  HomepageLine,
-  HomepageLink,
-  HomepageNewButton,
-  HomepageNewButtonContainer,
   HomepageOverlay,
-  HomepageSubtitle,
-  HomepageTitle,
-  HomepageButtonSubtitle
+  ProjectsListContainer,
+  ProjectsListCreateItem,
+  ProjectsListItem,
+  ProjectsListTitle,
+  ProjectsOverlay,
+  ProjectsTitleLine,
 } from "./style";
 
-import bg from "../Assets/Images/horse3.jpg";
-
-const Home = () => {
-  const navigate = useNavigate();
+const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setProjects(JSON.parse(localStorage.getItem("projects")));
@@ -59,16 +53,31 @@ const Home = () => {
   return (
     <div>
       <HomepageBackground src={bg} />
-      <HomepageOverlay>
-        <HomepageTitle>THE STALLION HARNESS</HomepageTitle>
-        <HomepageSubtitle>Harness your Creativity</HomepageSubtitle>
-        <HomepageNewButtonContainer>
-          <HomepageNewButton onClick={() => createNewProject()}>+ New Project</HomepageNewButton>
-          <HomepageButtonSubtitle onClick={() => navigate("/projects")}>Or View Current Projects</HomepageButtonSubtitle>
-        </HomepageNewButtonContainer>
-      </HomepageOverlay>
+      <ProjectsOverlay />
+      <ProjectsListTitle>CURRENT PROJECTS</ProjectsListTitle>
+      <ProjectsTitleLine />
+      <ProjectsListContainer>
+        {projects &&
+          projects.map((project) => (
+            <ProjectsListItem
+              onClick={() => {
+                navigate("/harness", { state: { id: project.id } });
+                window.location.reload();
+              }}
+            >
+              {project.name}
+            </ProjectsListItem>
+          ))}
+          <ProjectsListCreateItem
+              onClick={() => {
+                createNewProject();
+              }}
+            >
+              + Create New Project
+            </ProjectsListCreateItem>
+      </ProjectsListContainer>
     </div>
   );
 };
 
-export default Home;
+export default Projects;
